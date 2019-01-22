@@ -1,2 +1,2 @@
 # plexBookmarks
-Chrome extension that add bookmarks from web to your plex libary
+Chrome extension for https://app.plex.tv that add bookmarks from web to your plex libary
