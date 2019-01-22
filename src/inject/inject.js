@@ -1,6 +1,7 @@
 chrome.extension.sendMessage({}, function(response) {
 
 	const readyStateCheckInterval = setInterval(function() {
+	// todo find better way to get plex classes?
 	const isClassLoaded = $("div.MetadataListPageContent-metadataListScroller-1uFgY").hasClass( "MetadataListPageContent-metadataListScroller-1uFgY" );
 
 	if (document.readyState === "complete" && isClassLoaded) {
