@@ -29,7 +29,7 @@
     {
       "matches": [
         "https://app.plex.tv/*",
-        "127.0.0.1:32400/*"
+        "https://127.0.0.1:32400/*"
       ],
       "js": [
         "src/inject/inject.js",
