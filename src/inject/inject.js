@@ -87,15 +87,24 @@ chrome.extension.sendMessage({}, function(response) {
 					Append__inputImage = 'https://zhf1943ap1t4f26r11i05c7l-wpengine.netdna-ssl.com/wp-content/themes/plex/assets/img/plex-logo.svg'
 				}
 
-				// save data to localStorage
-				if (editIndex){
-					localStorage.setItem(`${currentPage()}__Append__inputLink__${editIndex}`, Append__inputLink);
-					localStorage.setItem(`${currentPage()}__Append__inputText__${editIndex}`, Append__inputText);
-					localStorage.setItem(`${currentPage()}__Append__inputImage__${editIndex}`, Append__inputImage);
-				} else {
-					localStorage.setItem(`${currentPage()}__Append__inputLink__${newIndex}`, Append__inputLink);
-					localStorage.setItem(`${currentPage()}__Append__inputText__${newIndex}`, Append__inputText);
-					localStorage.setItem(`${currentPage()}__Append__inputImage__${newIndex}`, Append__inputImage);
+				try {
+					// save data to localStorage
+					if (editIndex){
+						localStorage.setItem(`${currentPage()}__Append__inputLink__${editIndex}`, Append__inputLink);
+						localStorage.setItem(`${currentPage()}__Append__inputText__${editIndex}`, Append__inputText);
+						localStorage.setItem(`${currentPage()}__Append__inputImage__${editIndex}`, Append__inputImage);
+					} else {
+						localStorage.setItem(`${currentPage()}__Append__inputLink__${newIndex}`, Append__inputLink);
+						localStorage.setItem(`${currentPage()}__Append__inputText__${newIndex}`, Append__inputText);
+						localStorage.setItem(`${currentPage()}__Append__inputImage__${newIndex}`, Append__inputImage);
+					}
+				// if local storage is full show error
+				} catch (e) {
+					if (e.name === 'QUOTA_EXCEEDED_ERR') {
+						alert("Memory is full. Cannot save. You need to delete a few items first.");
+					} else {
+						alert("Something went wrong? Try again later or try to delete a few items?")
+					}
 				}
 
 				// remove all thumbs from dom
