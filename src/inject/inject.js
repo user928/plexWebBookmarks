@@ -1,11 +1,16 @@
 chrome.extension.sendMessage({}, function(response) {
 
 	const readyStateCheckInterval = setInterval(function() {
-	// todo find better way to get plex classes?
-	const isClassLoaded = $("div.MetadataListPageContent-metadataListScroller-1uFgY").hasClass( "MetadataListPageContent-metadataListScroller-1uFgY" );
 
-	if (document.readyState === "complete" && isClassLoaded) {
+	// todo find better way to get plex classes?
+	const isPlexClassLoaded = () => $('div').hasClass( "MetadataListPageContent-metadataListScroller-1uFgY");
+
+	if (document.readyState === "complete" && isPlexClassLoaded()) {
 		clearInterval(readyStateCheckInterval);
+
+		// find current page we are on
+		const currentPage =  $('a.Link-isSelected-IRm9u > div:last-child').text();
+		console.log('___ currentPage is: ', currentPage);
 
 		const indexGetter = () => {
 			let indexes = [];
@@ -86,21 +91,21 @@ chrome.extension.sendMessage({}, function(response) {
 			}
 		};
 
+		// destroy clicked thumb on .Append__thumbDelete
 		const destroyThumbOnClick = () => {
-			// destroy clicked thumb on .Append__thumbDelete
 			$('.Append__thumbDelete').on('click', function () {
 				const indexData = $(this).closest('.Append__thumb').attr('data-append-count');
 				localStorage.removeItem(`${indexData}---Append__inputLink`);
 				localStorage.removeItem(`${indexData}---Append__inputText`);
 				localStorage.removeItem(`${indexData}---Append__inputImage`);
-				console.log("___ > > > delete thumb ", indexData);
 				$(this).closest('.Append__thumb').remove()
 			})
 		};
 
+		// get data from local storage and append it to page
 		const thumbsDomAppender = () => {
-			// get data from local storage and append it to page
-			if (indexes.length) {
+			if (indexes.length && isPlexClassLoaded()) {
+
 				for (index of indexes) {
 					const link = localStorage.getItem(`${index}---Append__inputLink`);
 					const text = localStorage.getItem(`${index}---Append__inputText`);
@@ -117,7 +122,7 @@ chrome.extension.sendMessage({}, function(response) {
 					</div>`)
 				}
 
-				// set thumb width
+				// set thumb width so it look like all plex thumbs
 				const thumbWidth = $('.virtualized-cell-3KPHx').css('width');
 				$(".Append__thumb").css("width", thumbWidth);
 
@@ -129,13 +134,40 @@ chrome.extension.sendMessage({}, function(response) {
 		// append all thumbs on initial load
 		thumbsDomAppender();
 
+		// page change fnc
+		const changePage = () => {
 
+			// remove all thumbs from dom
+			thumbsDomRemoval();
 
+			// remove Add Bookmark button
+			$('.Append__buttonTopHeader').remove();
 
+			const pageChangeInterval = setInterval(function() {
 
+				if (isPlexClassLoaded()) {
+					clearInterval(pageChangeInterval);
 
+					// add thumbs to dom
+					thumbsDomAppender();
 
-		// ----------------------------------------------------------
+					// create Add Bookmark button
+					$('.pageHeaderToolbar-toolbar-1lW-M').append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
+
+					// (attach event again) append all thumbs on page change (click on Movies or Tv Shows ...)
+					$('[data-qa-id="sidebarLibrariesList"] a').on('click', () => {
+						changePage();
+					})
+				}
+			},100)
+		};
+
+		// append all thumbs on page change (click on Movies or Tv Shows ...)
+		$('[data-qa-id="sidebarLibrariesList"] a').on('click', () => {
+			changePage();
+		})
+
+		// END OF ALL ----------------------------------------------------------
 	}
-	}, 50);
+	}, 100);
 });
