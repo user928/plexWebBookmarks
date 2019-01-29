@@ -168,15 +168,17 @@ chrome.extension.sendMessage({}, function(response) {
 					</div>`)
 				}
 
-				// set thumb width so it look like all plex thumbs
-				const thumbWidth = $("[class*='virtualized-cell-']").css('width');
-				$(".Append__thumb").css("width", thumbWidth);
+				// set thumb width and height so it look like all other plex thumbs
+				const getPlexThumbCss = $("[class*='virtualized-cell-'] > div");
+				const appendThumb = $(".Append__thumb");
+				appendThumb.css("width", getPlexThumbCss.css('width'));
+				appendThumb.css("height", getPlexThumbCss.css('height'));
 
 				// assign destroy fnc to thumbs
 				destroyThisThumbOnClick();
 
 				// assign edit fnc to thumbs
-				editThisThumbOnClick()
+				editThisThumbOnClick();
 			}
 		};
 
