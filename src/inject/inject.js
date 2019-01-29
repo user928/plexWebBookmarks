@@ -33,7 +33,7 @@ chrome.extension.sendMessage({}, function(response) {
 		createAddBookmarkBtn();
 
 		// create Add Bookmark modal
-		const createAddBookmarkModal = () => {
+		const createAddBookmarkModal = (editIndex) => {
 
 			const plex = $('#plex');
 				plex.append(
@@ -53,22 +53,50 @@ chrome.extension.sendMessage({}, function(response) {
 				newIndex = lastIndex + 1;
 			}
 
+			if (editIndex) {
+
+				const editLink = localStorage.getItem(`${currentPage()}__Append__inputLink__${editIndex}`);
+				const editText = localStorage.getItem(`${currentPage()}__Append__inputText__${editIndex}`);
+				const editImage = localStorage.getItem(`${currentPage()}__Append__inputImage__${editIndex}`);
+
+				$('.Append__inputLink').val(editLink);
+				$('.Append__inputText').val(editText);
+				$('.Append__inputImage').val(editImage);
+			}
+
 			// save values from modal inputs and destroy modal
 			$('.Append__inputButtonAdd').on('click',  () => {
 
 				// get data from inputs
-				const Append__inputLink = $('.Append__inputLink').val();
-				const Append__inputText = $('.Append__inputText').val();
+				let Append__inputLink = $('.Append__inputLink').val();
+				let Append__inputText = $('.Append__inputText').val();
 				let Append__inputImage = $('.Append__inputImage').val();
 
+				// default link protocol
+				if (Append__inputLink.startsWith('www')) {
+					Append__inputLink = `https://${Append__inputLink}`;
+				}
+
+				// default text
+				if (!Append__inputText.length) {
+					Append__inputText = `${currentPage()} ${newIndex}`
+				}
+
+				// default image
 				if (!Append__inputImage.length) {
 					Append__inputImage = 'https://zhf1943ap1t4f26r11i05c7l-wpengine.netdna-ssl.com/wp-content/themes/plex/assets/img/plex-logo.svg'
 				}
 
 				// save data to localStorage
-				localStorage.setItem(`${currentPage()}__Append__inputLink__${newIndex}`, Append__inputLink);
-				localStorage.setItem(`${currentPage()}__Append__inputText__${newIndex}`, Append__inputText);
-				localStorage.setItem(`${currentPage()}__Append__inputImage__${newIndex}`, Append__inputImage);
+				if (editIndex){
+					localStorage.setItem(`${currentPage()}__Append__inputLink__${editIndex}`, Append__inputLink);
+					localStorage.setItem(`${currentPage()}__Append__inputText__${editIndex}`, Append__inputText);
+					localStorage.setItem(`${currentPage()}__Append__inputImage__${editIndex}`, Append__inputImage);
+				} else {
+					localStorage.setItem(`${currentPage()}__Append__inputLink__${newIndex}`, Append__inputLink);
+					localStorage.setItem(`${currentPage()}__Append__inputText__${newIndex}`, Append__inputText);
+					localStorage.setItem(`${currentPage()}__Append__inputImage__${newIndex}`, Append__inputImage);
+				}
 
 				// remove all thumbs from dom
 				thumbsDomRemoval();
@@ -102,12 +130,19 @@ chrome.extension.sendMessage({}, function(response) {
 		// destroy clicked thumb on .Append__thumbDelete
 		const destroyThisThumbOnClick = () => {
 			$('.Append__thumbDelete').on('click', function () {
-
 				const indexData = $(this).closest('.Append__thumb').attr('data-append-count');
 				localStorage.removeItem(`${currentPage()}__Append__inputLink__${indexData}`);
 				localStorage.removeItem(`${currentPage()}__Append__inputText__${indexData}`);
 				localStorage.removeItem(`${currentPage()}__Append__inputImage__${indexData}`);
 				$(this).closest('.Append__thumb').remove()
+			})
+		};
+
+		// edit clicked thumb on .Append__thumbEdit
+		const editThisThumbOnClick = () => {
+			$('.Append__thumbEdit').on('click', function () {
+				const indexData = $(this).closest('.Append__thumb').attr('data-append-count');
+				createAddBookmarkModal(indexData);
 			})
 		};
 
@@ -124,6 +159,7 @@ chrome.extension.sendMessage({}, function(response) {
 					// append thumb div on page
 					$("[class*='MetadataListPageContent-metadataListScroller-'] > div").append(`
 					<div class="Append__thumb" data-append-count=${index}>
+						<button class="Append__thumbEdit">Edit</button>
 						<a href=${link} target="_blank">
 							<img src=${image} alt="thumb image">
 							<span>${text}</span>
@@ -138,6 +174,9 @@ chrome.extension.sendMessage({}, function(response) {
 
 				// assign destroy fnc to thumbs
 				destroyThisThumbOnClick();
+
+				// assign edit fnc to thumbs
+				editThisThumbOnClick()
 			}
 		};
 
@@ -201,8 +240,8 @@ chrome.extension.sendMessage({}, function(response) {
 			onPageChange();
 		});
 
-		// TODO: FIND BETTER WAY TO HANDLE THIS !!!
-		// keep event alive if user go to different page and return to library page
+		// TODO: FIND BETTER WAY TO HANDLE PAGE CHANGE !!!
+		// this way we keep event alive if user go to different page and return to library page
 		setInterval( () => {
 			const newPageUrl = window.location.hash;
 
@@ -216,7 +255,6 @@ chrome.extension.sendMessage({}, function(response) {
 					onPageChange();
 				});
 			}
-
 		}, 2000)
 
 

@@ -56,7 +56,8 @@
 	text-overflow: ellipsis;
 }
 
-.Append__thumbDelete {
+.Append__thumbDelete,
+.Append__thumbEdit {
 	opacity: 0;
 	position: absolute;
 	bottom: 0;
@@ -67,7 +68,13 @@
 	border-radius: 2px;
 }
 
-.Append__thumb:hover .Append__thumbDelete {
+.Append__thumbEdit {
+	top: 0;
+	bottom: auto;
+}
+
+.Append__thumb:hover .Append__thumbDelete,
+.Append__thumb:hover .Append__thumbEdit {
 	opacity: 1;
 }
 
