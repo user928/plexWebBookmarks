@@ -2,23 +2,24 @@ chrome.extension.sendMessage({}, function(response) {
 
 	const readyStateCheckInterval = setInterval(function() {
 
-	// todo find better way to get plex classes?
-	const isPlexClassLoaded = () => $('div').hasClass( "MetadataListPageContent-metadataListScroller-1uFgY");
+		// check if main plex class is loaded (use jQuery Attribute Starts With Selector magic)
+		const isPlexClassLoaded = () => $('[class^="MetadataListPageContent-metadataListScroller"]').is('div');
 
-	if (document.readyState === "complete" && isPlexClassLoaded()) {
+		if (document.readyState === "complete" && isPlexClassLoaded()) {
 		clearInterval(readyStateCheckInterval);
 
-		// find current page we are on
-		const currentPage =  $('a.Link-isSelected-IRm9u > div:last-child').text();
-		console.log('___ currentPage is: ', currentPage);
+		let oldPageUrl = window.location.hash;
+
+		// find current page we are on (use jQuery jQuery [attribute*=value] Selector)
+		const currentPage =  () => $("a[class*='Link-isSelected']").find('> div:last-child').text();
 
 		const indexGetter = () => {
 			let indexes = [];
-			let indexesAndText = Object.keys(localStorage).filter(item => item.includes('---Append__inputLink'));
+			let indexesAndText = Object.keys(localStorage).filter(item => item.includes(`${currentPage()}__Append__inputLink`));
 
 			if (indexesAndText) {
 				for(index of indexesAndText) {
-					indexes.push(parseInt(index.split('---Append__inputLink')[0]))
+					indexes.push(parseInt(index.split(`${currentPage()}__Append__inputLink__`)[1]))
 				}
 			}
 			indexes.sort((a, b) => a - b);
@@ -27,62 +28,69 @@ chrome.extension.sendMessage({}, function(response) {
 
 		let indexes = indexGetter();
 
-		// show modal button
-		$('.pageHeaderToolbar-toolbar-1lW-M').append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
+		// create Add Bookmark button
+		const createAddBookmarkBtn = () => $("[class*='pageHeaderToolbar-toolbar-']").append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
+		createAddBookmarkBtn();
 
-		// modal creation
-		$(".Append__buttonTopHeader").on('click',
-			function () {
+		// create Add Bookmark modal
+		const createAddBookmarkModal = () => {
+
 			const plex = $('#plex');
-				plex.append('<div class="Append__modal">' +
-						'<input type="text" class="Append__inputLink" placeholder="Link to video" />' +
-						'<input class="Append__inputText" type="text" placeholder="Text" />' +
-						'<input class="Append__inputImage" type="text" placeholder="Link to image" />' +
-						'<button class="Append__inputButtonAdd">Add Bookmark</button>' +
-						'<button class="Append__inputButtonClose">Close (X)</button>' +
-					'</div>');
+				plex.append(
+				'<div class="Append__modal">' +
+					'<input type="text" class="Append__inputLink" placeholder="Link to video" />' +
+					'<input class="Append__inputText" type="text" placeholder="Text" />' +
+					'<input class="Append__inputImage" type="text" placeholder="Link to image" />' +
+					'<button class="Append__inputButtonAdd">Add Bookmark</button>' +
+					'<button class="Append__inputButtonClose">Close (X)</button>' +
+				'</div>');
 
-				// increase counter if needed
-				let newIndex = 0;
-				if (indexes.length) {
-					const lastIndex = indexes.pop();
-					newIndex = lastIndex + 1;
+			// increase counter if needed
+			let newIndex = 0;
+			indexes = indexGetter();
+			if (indexes.length) {
+				const lastIndex = indexes.pop();
+				newIndex = lastIndex + 1;
+			}
+
+			// save values from modal inputs and destroy modal
+			$('.Append__inputButtonAdd').on('click',  () => {
+
+				// get data from inputs
+				const Append__inputLink = $('.Append__inputLink').val();
+				const Append__inputText = $('.Append__inputText').val();
+				let Append__inputImage = $('.Append__inputImage').val();
+
+				if (!Append__inputImage.length) {
+					Append__inputImage = 'https://zhf1943ap1t4f26r11i05c7l-wpengine.netdna-ssl.com/wp-content/themes/plex/assets/img/plex-logo.svg'
 				}
 
-				// save values from inputs modal and destroy modal
-				$('.Append__inputButtonAdd').on('click',  () => {
+				// save data to localStorage
+				localStorage.setItem(`${currentPage()}__Append__inputLink__${newIndex}`, Append__inputLink);
+				localStorage.setItem(`${currentPage()}__Append__inputText__${newIndex}`, Append__inputText);
+				localStorage.setItem(`${currentPage()}__Append__inputImage__${newIndex}`, Append__inputImage);
 
-					// get data from inputs
-					const Append__inputLink = $('.Append__inputLink').val();
-					const Append__inputText = $('.Append__inputText').val();
-					let Append__inputImage = $('.Append__inputImage').val();
+				// remove all thumbs from dom
+				thumbsDomRemoval();
 
-					if (!Append__inputImage.length) {
-						Append__inputImage = 'https://zhf1943ap1t4f26r11i05c7l-wpengine.netdna-ssl.com/wp-content/themes/plex/assets/img/plex-logo.svg'
-					}
+				// add thumbs to dom (with new thumb from modal)
+				thumbsDomAppender();
 
-					// save data to localStorage
-					localStorage.setItem(`${newIndex}---Append__inputLink`, Append__inputLink);
-					localStorage.setItem(`${newIndex}---Append__inputText`, Append__inputText);
-					localStorage.setItem(`${newIndex}---Append__inputImage`, Append__inputImage);
+				// destroy modal when everything is done
+				$('.Append__modal').remove();
+			});
 
-					// remove all thumbs from dom
-					thumbsDomRemoval();
+			// destroy modal on close btn
+			$('.Append__inputButtonClose').on('click',  () => {
+				$('.Append__modal').remove();
+			});
+		};
 
-					// add thumbs to dom (with new thumb from modal)
-					thumbsDomAppender();
-
-					// destroy modal
-					$('.Append__modal').remove();
-				});
-
-				// destroy modal on close btn
-				$('.Append__inputButtonClose').on('click',  () => {
-					$('.Append__modal').remove();
-				});
-			}
+		$(".Append__buttonTopHeader").on('click',
+			() => createAddBookmarkModal()
 		);
 
+		// remove all thumbs from page
 		const thumbsDomRemoval = () => {
 			indexes = indexGetter();
 
@@ -92,27 +100,29 @@ chrome.extension.sendMessage({}, function(response) {
 		};
 
 		// destroy clicked thumb on .Append__thumbDelete
-		const destroyThumbOnClick = () => {
+		const destroyThisThumbOnClick = () => {
 			$('.Append__thumbDelete').on('click', function () {
+
 				const indexData = $(this).closest('.Append__thumb').attr('data-append-count');
-				localStorage.removeItem(`${indexData}---Append__inputLink`);
-				localStorage.removeItem(`${indexData}---Append__inputText`);
-				localStorage.removeItem(`${indexData}---Append__inputImage`);
+				localStorage.removeItem(`${currentPage()}__Append__inputLink__${indexData}`);
+				localStorage.removeItem(`${currentPage()}__Append__inputText__${indexData}`);
+				localStorage.removeItem(`${currentPage()}__Append__inputImage__${indexData}`);
 				$(this).closest('.Append__thumb').remove()
 			})
 		};
 
 		// get data from local storage and append it to page
 		const thumbsDomAppender = () => {
-			if (indexes.length && isPlexClassLoaded()) {
+			indexes = indexGetter();
+			if (indexes.length) {
 
 				for (index of indexes) {
-					const link = localStorage.getItem(`${index}---Append__inputLink`);
-					const text = localStorage.getItem(`${index}---Append__inputText`);
-					const image = localStorage.getItem(`${index}---Append__inputImage`);
+					const link = localStorage.getItem(`${currentPage()}__Append__inputLink__${index}`);
+					const text = localStorage.getItem(`${currentPage()}__Append__inputText__${index}`);
+					const image = localStorage.getItem(`${currentPage()}__Append__inputImage__${index}`);
 
 					// append thumb div on page
-					$('.MetadataListPageContent-metadataListScroller-1uFgY > div').append(`
+					$("[class*='MetadataListPageContent-metadataListScroller-'] > div").append(`
 					<div class="Append__thumb" data-append-count=${index}>
 						<a href=${link} target="_blank">
 							<img src=${image} alt="thumb image">
@@ -123,11 +133,11 @@ chrome.extension.sendMessage({}, function(response) {
 				}
 
 				// set thumb width so it look like all plex thumbs
-				const thumbWidth = $('.virtualized-cell-3KPHx').css('width');
+				const thumbWidth = $("[class*='virtualized-cell-']").css('width');
 				$(".Append__thumb").css("width", thumbWidth);
 
 				// assign destroy fnc to thumbs
-				destroyThumbOnClick();
+				destroyThisThumbOnClick();
 			}
 		};
 
@@ -135,7 +145,7 @@ chrome.extension.sendMessage({}, function(response) {
 		thumbsDomAppender();
 
 		// page change fnc
-		const changePage = () => {
+		const onPageChange = () => {
 
 			// remove all thumbs from dom
 			thumbsDomRemoval();
@@ -143,29 +153,72 @@ chrome.extension.sendMessage({}, function(response) {
 			// remove Add Bookmark button
 			$('.Append__buttonTopHeader').remove();
 
+			let pageChangeIntervalCounter = 0;
+
 			const pageChangeInterval = setInterval(function() {
+
+				// jQuery need find it again duuno why...
+				const sidebarLibrariesLinksAgainYesAgain = $("[data-qa-id^='sidebarLibrariesList'] a");
+
+				// clear pageChangeInterval after some time (if we are on some other plex page...)
+				pageChangeIntervalCounter += 1;
+				if (pageChangeIntervalCounter >= 100) {
+					clearInterval(pageChangeInterval);
+					// attach event again onPageChange
+					sidebarLibrariesLinksAgainYesAgain.off();
+					sidebarLibrariesLinksAgainYesAgain.on('click', () => {
+						onPageChange();
+					})
+				}
 
 				if (isPlexClassLoaded()) {
 					clearInterval(pageChangeInterval);
+					pageChangeIntervalCounter = 0; // clear pageChangeInterval after some time
 
-					// add thumbs to dom
+					// append all thumbs
 					thumbsDomAppender();
 
-					// create Add Bookmark button
-					$('.pageHeaderToolbar-toolbar-1lW-M').append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
+					// create Add Bookmark button (again)
+					createAddBookmarkBtn();
 
-					// (attach event again) append all thumbs on page change (click on Movies or Tv Shows ...)
-					$('[data-qa-id="sidebarLibrariesList"] a').on('click', () => {
-						changePage();
+					// create add bookmark modal and attach event (again)
+					$(".Append__buttonTopHeader").on('click',
+						() => createAddBookmarkModal()
+					);
+
+					// attach event again onPageChange
+					sidebarLibrariesLinksAgainYesAgain.off();
+					sidebarLibrariesLinksAgainYesAgain.on('click', () => {
+						onPageChange();
 					})
 				}
-			},100)
+			},100);
 		};
 
-		// append all thumbs on page change (click on Movies or Tv Shows ...)
-		$('[data-qa-id="sidebarLibrariesList"] a').on('click', () => {
-			changePage();
-		})
+		// append all thumbs on page change (click on Movies or Tv Shows library ...)
+		const sidebarLibrariesLinks = $("[data-qa-id^='sidebarLibrariesList'] a");
+		sidebarLibrariesLinks.on('click', () => {
+			onPageChange();
+		});
+
+		// TODO: FIND BETTER WAY TO HANDLE THIS !!!
+		// keep event alive if user go to different page and return to library page
+		setInterval( () => {
+			const newPageUrl = window.location.hash;
+
+			if (oldPageUrl !== newPageUrl) {
+				oldPageUrl = newPageUrl;
+
+				// append all thumbs on page change (click on Movies or Tv Shows library ...)
+				const sidebarLibrariesLinksAgain = $("[data-qa-id^='sidebarLibrariesList'] a");
+				sidebarLibrariesLinksAgain.off();
+				sidebarLibrariesLinksAgain.on('click', () => {
+					onPageChange();
+				});
+			}
+
+		}, 2000)
+
 
 		// END OF ALL ----------------------------------------------------------
 	}
