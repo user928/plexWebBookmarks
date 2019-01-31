@@ -170,11 +170,11 @@ chrome.extension.sendMessage({}, function(response) {
 					<div class="Append__thumb" data-append-count=${index}>
 						<button class="Append__thumbEdit">Edit</button>
 						<a href=${link} target="_blank">
-							<img src=${image} alt="thumb image">
+							<div class="Append__thumbImage" style="background-image: url(${image}) "></div>
 							<span>${text}</span>
 						</a>
 						<button class="Append__thumbDelete">Delete (X)</button>
-					</div>`)
+					</div>`);
 				}
 
 				// set thumb width and height so it look like all other plex thumbs
