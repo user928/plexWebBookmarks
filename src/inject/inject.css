@@ -36,13 +36,14 @@
 
 .Append__thumb:hover a::after {
 	content: '►';
+	text-indent: 4px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin-left: -25px;
-	width: 50px;
-	height: 50px;
-	margin-top: -25px;
+	margin-left: -21px;
+	width: 42px;
+	height: 42px;
+	margin-top: -21px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -63,7 +64,8 @@
 }
 
 .Append__thumbDelete,
-.Append__thumbEdit {
+.Append__thumbEdit,
+.Append__inputButtonClose {
 	opacity: 0;
 	position: absolute;
 	bottom: 0;
@@ -74,9 +76,19 @@
 	border-radius: 2px;
 }
 
+.Append__inputButtonClose {
+	top: -45px;
+	bottom: auto;
+	opacity: 1;
+}
+
 .Append__thumbEdit {
 	top: 0;
 	bottom: auto;
+}
+
+.Append__thumb:hover {
+	box-shadow: 0 0 0 2px #cc7b19;
 }
 
 .Append__thumb:hover .Append__thumbDelete,
@@ -99,12 +111,56 @@
 	margin-left: -250px;
 	top: 50%;
 	margin-top: -250px;
-	display: flex;
-	flex-direction: column;
-	padding: 20px;
+	padding: 50px 20px 20px;
 }
 
-.Append__modal > * {
+.Append__modalInner {
+	position: relative;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.Append__modalInner > * {
 	margin-bottom: 20px;
 	padding: 5px;
+}
+
+.Append__exportButtons {
+	position: absolute;
+	margin-bottom: 0;
+	bottom: 0;
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.Append__exportButtons * {
+	background: transparent;
+	color: #ffffff;
+	border: transparent;
+	width: 150px;
+	text-align: center;
+}
+.Append__exportButtons:hover * {
+	cursor: default;
+}
+
+/*hover on buttons and links*/
+.Append__thumbEdit:hover,
+.Append__thumbDelete:hover,
+.Append__inputButtonAdd:hover,
+.Append__inputButtonClose:hover,
+.Append__exportButtons:hover * {
+	color: #cc7b19;
+}
+
+.Append__exportButtonImportHidden {
+	position: absolute;
+	opacity: 0;
+	right: 50px;
+}
+
+.Append__exportButtonImportVisible {
+	pointer-events: none;
 }
