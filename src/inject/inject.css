@@ -77,7 +77,7 @@
 }
 
 .Append__inputButtonClose {
-	top: -45px;
+	top: -20px;
 	bottom: auto;
 	opacity: 1;
 }
@@ -111,7 +111,7 @@
 	margin-left: -250px;
 	top: 50%;
 	margin-top: -250px;
-	padding: 50px 20px 20px;
+	padding: 30px 20px 20px;
 }
 
 .Append__modalInner {
@@ -121,9 +121,13 @@
 	flex-direction: column;
 }
 
-.Append__modalInner > * {
-	margin-bottom: 20px;
+.Append__modalInner > input {
+	margin-bottom: 10px;
 	padding: 5px;
+}
+
+.Append__inputButtonAdd {
+	margin-top: 160px;
 }
 
 .Append__exportButtons {
