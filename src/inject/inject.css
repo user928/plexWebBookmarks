@@ -3,6 +3,8 @@
 .MetadataListPageContent-metadataListScroller-1uFgY > div {
 	display: flex;
 	flex-wrap: wrap;
+	width: auto !important;
+	height: auto !important;
 }
 
 .MetadataListPageContent-metadataListScroller-1uFgY > div > div {
