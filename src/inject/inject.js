@@ -10,13 +10,13 @@ chrome.extension.sendMessage({}, (response) => {
 
 		let oldPageUrl = window.location.hash;
 
-		// create div to hold all thumbs
-		const AppendContainerCreation = () => {
-			$('[class^="MetadataListPageContent-metadataListScroller"]').append('<div class="AppendContainer"></div>')
-		};
-
 		// find current page we are on (use jQuery [attribute*=value] Selector)
 		const currentPage =  () => $("a[class*='Link-isSelected']").find('> div:last-child').text();
+
+		// create div to hold all thumbs
+		const AppendContainerCreation = () => {
+			$('[class^="MetadataListPageContent-metadataListScroller"]').append(`<div class=AppendContainer><h1>${currentPage()} Bookmarks</h1></div>`)
+		};
 
 		const indexGetter = () => {
 			let indexes = [];
