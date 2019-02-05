@@ -1,9 +1,9 @@
 {
-  "name": "PLEX BOOKMARKS",
+  "name": "PLEX WEB BOOKMARKS",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "This extension was created with the awesome extensionizr.com",
-  "homepage_url": "http://extensionizr.com",
+  "description": "Chrome extension for https://app.plex.tv that add bookmarks from web to your plex libary",
+  "homepage_url": "https://github.com/user928/plexWebBookmarks",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -28,8 +28,7 @@
     },
     {
       "matches": [
-        "https://app.plex.tv/*",
-        "https://127.0.0.1:32400/*"
+        "https://app.plex.tv/*"
       ],
       "js": [
         "src/inject/inject.js",
