@@ -2,7 +2,7 @@ chrome.extension.sendMessage({}, (response) => {
 
 	const readyStateCheckInterval = setInterval(() => {
 
-		// check if main plex class is loaded (use jQuery Attribute Starts With Selector)
+		// check if main plex class is loaded (use jQuery Attribute Starts With Selector) (https://www.dropbox.com/s/vr20a76wmqob4lz/Plex%202019-08-16%2022-43-20.jpg?dl=0)
 		const isPlexClassLoaded = () => $('[class^="MetadataListPageContent-metadataListScroller"]').is('div');
 
 		if (document.readyState === "complete" && isPlexClassLoaded()) {
@@ -10,8 +10,8 @@ chrome.extension.sendMessage({}, (response) => {
 
 		let oldPageUrl = window.location.hash;
 
-		// find current page we are on (use jQuery [attribute*=value] Selector)
-		const currentPage =  () => $("a[class*='Link-isSelected']").find('> div:last-child').text();
+		// find current page we are on (use jQuery [attribute*=value] Selector) (https://www.dropbox.com/s/p2m0pii5n28qj9v/SourceSidebarLink-isSelected.jpg?dl=0)
+		const currentPage =  () => $("[class*='SourceSidebarLink-isSelected']").find("[class*='SourceSidebarLink-title-']").text();
 
 		// create div to hold all thumbs
 		const AppendContainerCreation = () => {
@@ -33,7 +33,7 @@ chrome.extension.sendMessage({}, (response) => {
 
 		let indexes = indexGetter();
 
-		// create Add Bookmark button
+		// create Add Bookmark button (https://www.dropbox.com/s/coz96lq93dxzslj/pageHeaderToolbar-toolbar-.jpg?dl=0)
 		const createAddBookmarkBtn = () => $("[class*='pageHeaderToolbar-toolbar-']").append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
 		createAddBookmarkBtn();
 
@@ -267,8 +267,8 @@ chrome.extension.sendMessage({}, (response) => {
 					</div>`);
 				}
 
-				// set thumb width and height so it look like all other plex thumbs
-				const getPlexThumbCss = $("[class*='virtualized-cell-'] > div");
+				// set thumb width and height so it look like all other plex thumbs (https://www.dropbox.com/s/omuv5mhaocyuonz/MetadataPosterCard-cardContainer.jpg?dl=0)
+				const getPlexThumbCss = $("[class*='MetadataPosterCard-cardContainer'] > div");
 				const appendThumb = $(".Append__thumb");
 				appendThumb.css("width", getPlexThumbCss.css('width'));
 				appendThumb.css("height", getPlexThumbCss.css('height'));
@@ -298,7 +298,7 @@ chrome.extension.sendMessage({}, (response) => {
 			const pageChangeInterval = setInterval(() => {
 
 				// jQuery need find it again duuno why...
-				const sidebarLibrariesLinksAgainYesAgain = $("[data-qa-id^='sidebarLibrariesList'] a");
+				const sidebarLibrariesLinksAgainYesAgain = $("[data-qa-id^='sidebarSource'] a");
 
 				// clear pageChangeInterval after some time (if we are on some other plex page...)
 				pageChangeIntervalCounter += 1;
@@ -336,7 +336,7 @@ chrome.extension.sendMessage({}, (response) => {
 		};
 
 		// append all thumbs on page change (click on Movies or Tv Shows library ...)
-		const sidebarLibrariesLinks = $("[data-qa-id^='sidebarLibrariesList'] a");
+		const sidebarLibrariesLinks = $("[data-qa-id^='sidebarSource'] a");
 		sidebarLibrariesLinks.on('click', () => {
 			onPageChange();
 		});
@@ -350,7 +350,7 @@ chrome.extension.sendMessage({}, (response) => {
 				oldPageUrl = newPageUrl;
 
 				// append all thumbs on page change (click on Movies or Tv Shows library ...)
-				const sidebarLibrariesLinksAgain = $("[data-qa-id^='sidebarLibrariesList'] a");
+				const sidebarLibrariesLinksAgain = $("[data-qa-id^='sidebarSource'] a");
 				sidebarLibrariesLinksAgain.off();
 				sidebarLibrariesLinksAgain.on('click', () => {
 					onPageChange();
