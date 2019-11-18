@@ -34,7 +34,7 @@ chrome.extension.sendMessage({}, (response) => {
 		let indexes = indexGetter();
 
 		// create Add Bookmark button (https://www.dropbox.com/s/coz96lq93dxzslj/pageHeaderToolbar-toolbar-.jpg?dl=0)
-		const createAddBookmarkBtn = () => $("[class*='pageHeaderToolbar-toolbar-']").append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
+		const createAddBookmarkBtn = () => $("[class*='measuredPageHeaderToolbar-toolbar-']").append('<button class="Append__buttonTopHeader">Add Bookmark</button>');
 		createAddBookmarkBtn();
 
 		// create Add Bookmark modal

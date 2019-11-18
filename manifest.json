@@ -1,6 +1,6 @@
 {
   "name": "PLEX WEB BOOKMARKS",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "manifest_version": 2,
   "description": "Chrome extension for https://app.plex.tv that add bookmarks from web to your plex library",
   "homepage_url": "https://github.com/user928/plexWebBookmarks",
